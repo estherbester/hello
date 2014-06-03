@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+
+</head>
+<body>
+<div class="container">
+<br />
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-warning alert-dismissable">
+          {{ message }} <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<h2>New Attendee</h2>
+<br />
+<form class="form-horizontal" role="form" action="{{ url_for('add_entry') }}" method=post class=add-entry>
+  <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Name/Who are you?*</label>
+          <div class="col-sm-10 col-lg-4">
+                <textarea name="name" rows=2 class="form-control" ></textarea>
+          </div>
+  </div>
+  <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Why are you here?*</label>
+          <div class="col-sm-10 col-lg-4">
+                <textarea name="why" rows=2 class="form-control" ></textarea>
+            </div>
+  </div>
+   <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">One fun fact about yourself:*</label>
+          <div class="col-sm-10 col-lg-4">
+                <textarea name="fun" rows=2 class="form-control" ></textarea>
+            </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Submit</button>
+    </div>
+  </div>
+</form>
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+<script type="text/javascript">
+$( document ).ready(function() {
+    $(".btn").click(function( event ) {
+        event.preventDefault();
+        var form_elements = $('textarea');
+        var valid_form = true;  // presume innocence
+
+        $.each(form_elements, function(idx, element){
+            if (element.textLength < 1) {
+                valid_form = false;
+                return false;
+            }
+        });
+        if (valid_form){
+           $("form").submit();
+        } else {
+            alert("Please fill out all the fields! ");
+        }
+    });
+});
+
+</script>
+</div>
+</body>
+</html>
