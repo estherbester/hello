@@ -38,6 +38,13 @@
                 <textarea name="name" rows=2 class="form-control" ></textarea>
           </div>
   </div>
+
+  <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Twitter Handle: @</label>
+          <div class="col-sm-10 col-lg-4">
+                <input name="twitter" type="text" class="form-control" />
+            </div>
+  </div>
   <div class="form-group">
           <label for="inputEmail3" class="col-sm-2 control-label">Why are you here?*</label>
           <div class="col-sm-10 col-lg-4">
@@ -68,7 +75,7 @@ $( document ).ready(function() {
         var valid_form = true;  // presume innocence
 
         $.each(form_elements, function(idx, element){
-            if (element.textLength < 1) {
+            if (element.name !== 'twitter' && element.textLength < 1) {
                 valid_form = false;
                 return false;
             }

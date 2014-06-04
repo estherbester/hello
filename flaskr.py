@@ -11,10 +11,12 @@
 """
 
 import os
+from twython import Twython
+from twython.exceptions import TwythonError
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-
+from settings import OTOKEN, SECRET, KEY, OSECRET 
 
 # create our little application :)
 app = Flask(__name__,  static_url_path='')
@@ -28,7 +30,6 @@ app.config.update(dict(
     PASSWORD='default'
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
-
 
 def connect_db():
     """Connects to the specific database."""
@@ -68,13 +69,20 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
-
 @app.route('/')
 def show_entries():
     db = get_db()
-    cur = db.execute('select id, name, why, fun from entries order by id asc')
+    cur = db.execute('select id, twitter, name, why, fun from entries order by id asc')
     entries = cur.fetchall()
     return render_template('render.html', entries=entries)
+
+@app.route('/csv')
+def print_to_csv():
+    import string
+    db = get_db()
+    cur = db.execute('select id, twitter, name, why, fun from entries order by id asc')
+    entries = cur.fetchall()
+    return render_template('csv.csv', entries=entries)
 
 @app.route('/new')
 def new():
@@ -89,8 +97,8 @@ def add_entry():
     #    abort(401)
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('insert into entries (name, why, fun) values (?, ?, ?)',
-               [request.form['name'], request.form['why'], request.form['fun']])
+    cursor.execute('insert into entries (name, twitter, why, fun) values (?,?, ?, ?)',
+               [request.form['name'], request.form['twitter'], request.form['why'], request.form['fun']])
     flash('New person added! ID:%s' % cursor.lastrowid)
     db.commit()
     return redirect(url_for('new'))
@@ -117,5 +125,29 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
+def get_twav(account_name):
+    """ get twitter icon """
+    if account_name is None:
+        return None
+    if account_name.startswith('@'):
+        account_name = account_name.lstrip('@')
+
+    api = 'https://api.twitter.com/1.1/users/show.json'
+    args = {'screen_name': account_name}
+    t = Twython(app_key=KEY,
+                app_secret=SECRET,
+                oauth_token=OTOKEN,
+                oauth_token_secret=OSECRET)
+    try:
+        resp = t.request(api, params=args)
+        image = resp['profile_image_url']
+        first, last = image.split('_normal')  # to get the regular size
+    except (TwythonError, ValueError):
+        return None
+    return first + last
+
+app.jinja_env.globals.update(get_twav=get_twav)
+
+
 if __name__ == "__main__":
-    app.run(port=8085, host='0.0.0.0')
+    app.run(port=8000, host='0.0.0.0')

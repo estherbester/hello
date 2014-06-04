@@ -1,0 +1,2 @@
+id,name,twitter,why,fun<br />
+{% for entry in entries %}{{entry.id}},{{entry.name}},{{entry.twitter}},{{entry.why}},{{entry.fun}}<br />{%endfor%}
